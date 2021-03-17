@@ -34,58 +34,6 @@ const wrapper = (db) => {
       console.log(newAccepted_By);
       res.json({ newAccepted_By, chats });
     }
-    // async deleteWhole(req,res) {
-    //     const {chats,user} = req.body;
-    //     for(let chat of chat) {
-    //         if(chat.type === "group"){
-    //                     await db("user_chat").where({groupid,type:"group"}).del()
-    //                     const allMsgs = []
-    //                     const chats = await db("group_chat").where({groupid});
-    //                         const updatedChat = []
-    //                         for(let chat of chats){
-    //                             const accepted_by = chat.accepted_by.split(",");
-    //                             if(accepted_by.indexOf(user) !== -1){
-    //                                 accepted_by.splice(accepted_by.indexOf(user),1)
-    //                                 chat.accepted_by = accepted_by.join()
-    //                                 console.log(accepted_by)
-    //                                 updatedChat.push(chat);
-    //                                 await db("group_chat").where({groupid,chatid:chat.chatid}).update({accepted_by:accepted_by.join()});
-    //                                 if(accepted_by.length === 0 ){
-    //                                     await db("group_chat").where({chatid:chat.chatid}).del();
-    //                                 }
-    //                             }
-
-    //                         }
-
-    //                     res.json(allMsgs)
-
-    //                 }
-    //         else if(chat.type === "private"){
-    //                     const allMsgs = []
-    //                 await db("user_chat").where({receiverName:friend , type:"private"}).del()
-    //                     for(let friend of friends){
-    //                         const chats = await await db("private_messages").where({sender:user,receiver:friend}).orWhere({sender:friend,receiver:user});
-    //                         const updatedChat = []
-    //                         for(let chat of chats){
-    //                             const accepted_by = chat.accepted_by.split(",");
-    //                             if(accepted_by.indexOf(user) !== -1){
-    //                                 accepted_by.splice(accepted_by.indexOf(user),1)
-    //                                 chat.accepted_by = accepted_by.join()
-    //                                 updatedChat.push(chat);
-
-    //                                 if(accepted_by.length === 0 ){
-    //                                     await db("private_messages").where({chatid:chat.chatid}).del();
-    //                                 }
-    //                             }
-
-    //                         }
-    //                         allMsgs.push(updatedChat)
-    //                     }
-    //                     res.json(allMsgs)
-    //                 }
-    //     }
-
-    // }
     async deleteWhole(req, res) {
       const { chatrooms, username: user } = req.body;
       //console.log(chatrooms);

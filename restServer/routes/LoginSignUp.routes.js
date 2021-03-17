@@ -24,7 +24,6 @@ const wrapper = (db) => {
     async signUp(req, res) {
       // getting username,password, email from body
       const { username, password, email } = req.body;
-
       try {
         // Creating New User
         await db("all_users").insert({

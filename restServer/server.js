@@ -7,7 +7,6 @@ const app = express();
 const groupRoute = require("./routes/group.routes");
 const DeleteRoute = require("./routes/deleteChat.routes");
 const LoginSignUp = require("./routes/LoginSignUp.routes");
-const { uid } = require("uid/secure");
 const db = knex({
   client: "mysql2",
   connection: {
