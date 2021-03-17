@@ -1,7 +1,21 @@
 import { useState } from "react";
+import { useHistory } from "react-router-dom";
 const SignUp = () => {
+  const history = useHistory();
   const [userInfo, setUserInfo] = useState({});
-  const onSignUp = () => {};
+  const onSignUp = () => {
+    fetch("http://localhost:5005/signup", {
+      method: "POST",
+      body: JSON.stringify(userInfo),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((user) => {
+        history.push("/");
+      });
+  };
   return (
     <div className="">
       <label>
