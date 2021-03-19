@@ -35,9 +35,9 @@ const group = {};
 
 io.on("connection", (socket) => {
   console.log("hello");
-
   socket.on("user_connected", async (data) => {
     const { username, currentPosition, id } = data;
+    console.log(data);
     users[socket.id] = {
       id: socket.id,
       username,

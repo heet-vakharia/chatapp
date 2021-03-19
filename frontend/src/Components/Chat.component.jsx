@@ -4,8 +4,8 @@ import { useHistory, useParams } from "react-router-dom";
 import { uid } from "uid";
 import { Link } from "react-router-dom";
 let socket;
-const PrivateChat = ({ group }) => {
-  const { friend, groupid, type, user, group_name } = useParams();
+const PrivateChat = ({ user }) => {
+  const { friend, groupid, type } = useParams();
   const [msgs, setMsgs] = useState([
     {
       sender: "",
@@ -33,7 +33,7 @@ const PrivateChat = ({ group }) => {
           setMsgs(data);
         });
     } else if (type === "group") {
-      fetch("http://localhost:5005/allGroupMessages", {
+      fetch("http://localhost:5005/group/allGroupMessages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +44,7 @@ const PrivateChat = ({ group }) => {
         }),
       })
         .then((response) => response.json())
-        .then(({ data }) => {
+        .then((data) => {
           setMsgs(data.chats);
           if (data.left_date) {
             setIsUserAllow(false);
@@ -64,7 +64,7 @@ const PrivateChat = ({ group }) => {
   }, []);
   useEffect(() => {
     console.log(123);
-    if (type === "group") {
+    if (type === "group" && user) {
       socket.emit("user_connected", {
         username: user,
         currentPosition: "group",
@@ -171,6 +171,7 @@ const PrivateChat = ({ group }) => {
           Id: uid(),
           time: Date(),
         });
+        console.log(msgArr);
         setMsgs(msgArr);
         setCurrentMsg("");
       } else {
@@ -217,6 +218,7 @@ const PrivateChat = ({ group }) => {
         {!deleteMsg ? "delete message" : "cancel"}
       </button>
       {msgs.map((msg) => {
+        console.log("hello", msg);
         if (msg.type === "message" || type === "dm") {
           return (
             <div className="" key={msg.Id}>

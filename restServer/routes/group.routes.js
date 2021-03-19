@@ -61,7 +61,7 @@ const wrapper = (db) => {
           }
         }
       }
-      // console.log(allMsgs)
+      console.log(allMsgs);
       res.status(200).json({
         chats: allMsgs,
         left_date: userInfo[0].left_date,

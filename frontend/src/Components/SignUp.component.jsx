@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { useHistory } from "react-router-dom";
-const SignUp = () => {
+import { useHistory, Link } from "react-router-dom";
+const SignUp = ({ setUser }) => {
   const history = useHistory();
   const [userInfo, setUserInfo] = useState({});
   const onSignUp = () => {
+    if (!userInfo.username || !userInfo.password || !userInfo.email) {
+      return;
+    }
     fetch("http://localhost:5005/signup", {
       method: "POST",
       body: JSON.stringify(userInfo),
@@ -12,8 +15,9 @@ const SignUp = () => {
       },
     })
       .then((response) => response.json())
-      .then((user) => {
+      .then(({ user }) => {
         history.push("/");
+        setUser(user);
       });
   };
   return (
@@ -46,6 +50,7 @@ const SignUp = () => {
         />
       </label>
       <button onClick={onSignUp}>Sign Up</button>
+      <Link to={"/login"}>Login</Link>
     </div>
   );
 };

@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 
-const Login = () => {
+const Login = ({ setUser }) => {
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
   const history = useHistory();
   const onLogin = () => {
+    // Checking if user is typed username and password before clicking btn
+    if (!credentials.password || !credentials.username) {
+      return;
+    }
     fetch("http://localhost:5005/login", {
       method: "POST",
       body: JSON.stringify(credentials),
@@ -16,8 +20,10 @@ const Login = () => {
       },
     })
       .then((response) => response.json())
-      .then((user) => {
+      .then(({ user }) => {
         console.log(user);
+        // setting the main user
+        setUser(user);
         //   pushing route to "/"
         history.push("/");
       });
@@ -43,6 +49,7 @@ const Login = () => {
         />
       </label>
       <button onClick={onLogin}>login</button>
+      <Link to={"/signup"}>signup</Link>
     </div>
   );
 };

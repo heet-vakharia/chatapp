@@ -24,14 +24,15 @@ app.use(express.json());
 db.schema.hasTable("all_users").then(function (exists) {
   if (!exists) {
     return db.schema.createTable("all_users", function (t) {
-      t.string("userid").unique();
-      t.string("username").unique();
-      t.string("email").unique();
-      t.string("password");
+      t.string("userid").unique().notNullable();
+      t.string("username").unique().notNullable();
+      t.string("email").unique().notNullable();
+      t.string("password").notNullable();
       t.timestamp("joined_on").defaultTo(db.fn.now());
     });
   }
 });
+
 // all group routes
 app.use("/group", groupRoute(db));
 // all delete routes
@@ -60,9 +61,11 @@ app.get("/allPrivateMessages", async (req, res) => {
 // Fetching chatlist of user
 app.get("/chatList", async (req, res) => {
   const { username } = req.query;
+  console.log(username);
   const chats = await db("user_chat")
     .where({ username })
-    .orderBy("last_updated", "desc");
+    .orderBy("last_updated");
+  console.log(chats);
   res.json(chats);
 });
 // Fetching all users
