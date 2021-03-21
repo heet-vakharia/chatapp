@@ -19,6 +19,7 @@ const leaveGroup = async ({ data, db, io }) => {
   }
 
   await db("group_info").where({ groupid, member: user }).del();
+  await db("user_chat").where({ groupid, username: user }).del();
   const socketids = await db("socketids").whereIn("name", [
     ...members,
     ...admins,

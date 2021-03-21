@@ -43,6 +43,7 @@ app.use("/", LoginSignUp(db));
 app.get("/allPrivateMessages", async (req, res) => {
   //getting user and friend from query
   const { user, friend } = req.query;
+
   // getting all chat messages done between user and friend
   const chats = await db("private_messages")
     .where({ sender: user, receiver: friend })

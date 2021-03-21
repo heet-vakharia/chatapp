@@ -9,6 +9,7 @@ const Login = ({ setUser }) => {
   const history = useHistory();
   const onLogin = () => {
     // Checking if user is typed username and password before clicking btn
+    console.log(credentials);
     if (!credentials.password || !credentials.username) {
       return;
     }

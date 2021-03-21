@@ -5,7 +5,7 @@ import { uid } from "uid";
 import { Link } from "react-router-dom";
 let socket;
 const PrivateChat = ({ user }) => {
-  const { friend, groupid, type } = useParams();
+  const { id, type } = useParams();
   const [msgs, setMsgs] = useState([
     {
       sender: "",
@@ -19,17 +19,20 @@ const PrivateChat = ({ user }) => {
   const [isUserAllow, setIsUserAllow] = useState(true);
   const [currentMsg, setCurrentMsg] = useState("");
   const getAllMessages = () => {
+    console.log(id);
     if (type === "dm") {
-      fetch("http://localhost:5005/allPrivateMessages", {
-        method: "GET",
-        params: {
-          user,
-          friend,
-        },
-      })
+      fetch(
+        `http://localhost:5005/allPrivateMessages?user=${user}&friend=${id}`,
+        {
+          method: "GET",
+          params: {
+            user,
+            friend: id,
+          },
+        }
+      )
         .then((response) => response.json())
-        .then(({ data }) => {
-          console.log(data);
+        .then((data) => {
           setMsgs(data);
         });
     } else if (type === "group") {
@@ -39,7 +42,7 @@ const PrivateChat = ({ user }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          groupid: groupid,
+          groupid: id,
           username: user,
         }),
       })
@@ -59,44 +62,38 @@ const PrivateChat = ({ user }) => {
     }
   };
   useEffect(() => {
-    console.log(groupid, type);
     socket = io("127.0.0.1:3003", { transports: ["websocket"] });
   }, []);
   useEffect(() => {
-    console.log(123);
     if (type === "group" && user) {
       socket.emit("user_connected", {
         username: user,
         currentPosition: "group",
-        id: groupid,
+        id,
       });
       socket.emit("on-groupchat", {
-        groupid,
+        groupid: id,
         username: user,
       });
     } else if (type === "dm") {
       socket.emit("on-privatechat", {
         user,
-        friend,
+        friend: id,
       });
       socket.emit("user_connected", {
         username: user,
         currentPosition: "private",
-        id: friend,
+        id,
       });
     }
-    if (user) {
-      console.log(friend, user);
-    }
+
     getAllMessages();
     //return socket.disconnect()
   }, []);
 
   useEffect(() => {
-    console.log("hello");
     socket.on("new-message", (data) => {
-      console.log(data);
-      if (data.sender === friend || data.sender === user) {
+      if (data.sender === id || data.sender === user) {
         getAllMessages();
         currentMsg === " " ? setCurrentMsg("") : setCurrentMsg(" ");
       } else {
@@ -104,17 +101,16 @@ const PrivateChat = ({ user }) => {
       }
     });
     socket.on("group-noti", (data) => {
-      console.log(data);
       switch (data.type) {
         case "new message":
-          if (groupid === data.content.groupid) {
+          if (id === data.content.groupid) {
             getAllMessages();
           } else {
             alert(`${data.content.sender} has send a msg`);
           }
           break;
         case "delete member":
-          if (groupid === data.content.groupid) {
+          if (id === data.content.groupid) {
             getAllMessages();
           }
           break;
@@ -150,7 +146,7 @@ const PrivateChat = ({ user }) => {
         .then((response) => response.json())
         .then((data) => {
           getAllMessages();
-          console.log(data);
+
           setSelectedMessages([]);
           setDeleteMsg(false);
         });
@@ -161,7 +157,7 @@ const PrivateChat = ({ user }) => {
       if (type === "dm") {
         const data = {
           sender: user,
-          receiver: friend,
+          receiver: id,
           text: currentMsg,
         };
         socket.emit("send-private", data);
@@ -171,13 +167,13 @@ const PrivateChat = ({ user }) => {
           Id: uid(),
           time: Date(),
         });
-        console.log(msgArr);
+
         setMsgs(msgArr);
         setCurrentMsg("");
       } else {
         const data = {
           sender: user,
-          groupid,
+          groupid: id,
           text: currentMsg,
         };
         socket.emit("send-group", data);
@@ -217,40 +213,41 @@ const PrivateChat = ({ user }) => {
       >
         {!deleteMsg ? "delete message" : "cancel"}
       </button>
-      {msgs.map((msg) => {
-        console.log("hello", msg);
-        if (msg.type === "message" || type === "dm") {
-          return (
-            <div className="" key={msg.Id}>
-              {msg.sender}:
-              <span
-                onClick={async () => {
-                  await navigator.clipboard.writeText(msg.text);
-                  alert(`${msg.text} copied`);
-                }}
-              >
-                {msg.text}
-              </span>
-              {deleteMsg ? (
-                <label key={uid()}>
-                  <input
-                    type="checkbox"
-                    name=""
-                    id=""
-                    key={uid()}
-                    onClick={() => onMessageSelect(msg.chatid)}
-                  />
-                </label>
-              ) : null}
-            </div>
-          );
-        } else if (msg.type === "announcement")
-          return (
-            <div className="" key={msg.Id}>
-              {msg.text}
-            </div>
-          );
-      })}
+      {msgs
+        ? msgs.map((msg) => {
+            if (msg.type === "message" || type === "dm") {
+              return (
+                <div className="" key={msg.Id}>
+                  {msg.sender}:
+                  <span
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(msg.text);
+                      alert(`${msg.text} copied`);
+                    }}
+                  >
+                    {msg.text}
+                  </span>
+                  {deleteMsg ? (
+                    <label key={uid()}>
+                      <input
+                        type="checkbox"
+                        name=""
+                        id=""
+                        key={uid()}
+                        onClick={() => onMessageSelect(msg.chatid)}
+                      />
+                    </label>
+                  ) : null}
+                </div>
+              );
+            } else if (msg.type === "announcement")
+              return (
+                <div className="" key={msg.Id}>
+                  {msg.text}
+                </div>
+              );
+          })
+        : null}
       {/* <form action=""> */}
       {deleteMsg ? <button onClick={onDeleteMessage}>Delete</button> : null}
       <input
@@ -262,9 +259,9 @@ const PrivateChat = ({ user }) => {
         disabled={isUserAllow ? false : true}
       />
       <button onClick={onClickHandle}>Submit</button>
-      <Link to="/chatdir"> back </Link>
+      <Link to="/"> back </Link>
       {/* </form> */}
-      <Link to={`/${groupid}/edit/${user}`}>Setting</Link>
+      <Link to={`/${id}/edit`}>Setting</Link>
     </div>
   );
 };

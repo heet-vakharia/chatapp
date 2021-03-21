@@ -14,6 +14,8 @@ const addMember = async ({ data, db, io }) => {
     .where({ groupid })
     .update({ member: [...members, ...newMembers].join() });
   members.push(...groupInfo[0].admins.split(","));
+  const newGroupInfo = await db("all_groups").where({ groupid });
+
   const memberSocketIds = await db("socketids").whereIn("name", [
     ...members,
     newMembers,
@@ -22,7 +24,11 @@ const addMember = async ({ data, db, io }) => {
     io.to(memberSocketId.id).emit("group-noti", {
       type: "new member",
       content: {
-        members: newMembers,
+        group: {
+          members: newGroupInfo[0].member.split(","),
+          admins: newGroupInfo[0].admins.split(","),
+          groupid,
+        },
         added_by: username,
         on: Date(),
       },

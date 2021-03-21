@@ -13,6 +13,10 @@ const ChatDir = ({ user }) => {
   const history = useHistory();
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [friendSearch, setFriendSearch] = useState("");
+  const [dmSearch, setDmSearch] = useState({
+    search: "",
+    suggestions: [],
+  });
   useEffect(() => {
     socket = io("127.0.0.1:3003", { transports: ["websocket"] });
   }, []);
@@ -30,15 +34,19 @@ const ChatDir = ({ user }) => {
     }
   };
   useEffect(() => {
-    console.log(user);
+    console.log(user, "uashi");
     fetch("http://localhost:5005/allUsers")
       .then((response) => response.json())
-      .then(({ users }) => setFriends(users));
+      .then(({ users }) => {
+        setFriends(users);
+        setDmSearch({ ...dmSearch, suggestions: users });
+      });
     socket.emit("user_connected", {
-      username: "heet",
+      username: user.username,
       currentPosition: "chatdir",
       id: null,
     });
+
     fetchChats();
   }, []);
   useEffect(() => {
@@ -46,7 +54,7 @@ const ChatDir = ({ user }) => {
       switch (data.type) {
         case "new group":
           console.log(data);
-          history.push(`/group/@${data.content.groupid}`);
+          history.push(`/group/${data.content.groupid}`);
           break;
         default:
           break;
@@ -81,7 +89,7 @@ const ChatDir = ({ user }) => {
         },
         body: JSON.stringify({
           chatrooms: selectedChats,
-          username: user.name,
+          username: user.username,
         }),
       })
         .then((response) => response.json())
@@ -97,7 +105,7 @@ const ChatDir = ({ user }) => {
     if (isCreate && groupName && selectedFriends.length > 0) {
       const data = {
         members: selectedFriends,
-        username: "heet",
+        username: user.username,
         group_name: groupName,
       };
       socket.emit("create-group", data);
@@ -127,7 +135,31 @@ const ChatDir = ({ user }) => {
       >
         {!deleteChat ? "delete Chat" : "cancel"}
       </button>
-
+      <div className="private_chat">
+        <input
+          type="text"
+          value={dmSearch.search}
+          onChange={({ target }) =>
+            setDmSearch({ ...dmSearch, search: target.value })
+          }
+        />
+        <div className="suggestion">
+          {dmSearch.suggestions.map((suggestion) =>
+            suggestion.username.toLowerCase().includes(dmSearch.search) &&
+            suggestion.username !== user.username ? (
+              <div className="" key={uid()}>
+                <Link to={`/dm/${suggestion.username}`}>
+                  {" "}
+                  {suggestion.username}
+                </Link>
+              </div>
+            ) : null
+          )}
+          <p>
+            ----------------------------------------------------------------
+          </p>
+        </div>
+      </div>
       <ul>
         {chats.map((chat) => {
           return (
@@ -135,8 +167,8 @@ const ChatDir = ({ user }) => {
               <Link
                 to={
                   chat.type === "private"
-                    ? `/dm/@${chat.receiverName}}`
-                    : `/group/@${chat.groupid}`
+                    ? `/dm/${chat.receiverName}}`
+                    : `/group/${chat.groupid}`
                 }
                 key={uid()}
               >

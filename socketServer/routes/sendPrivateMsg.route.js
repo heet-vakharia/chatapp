@@ -2,7 +2,8 @@ const { uid } = require("uid/secure");
 
 const sendPrivateMsg = async ({ data, db, io, socket, users }) => {
   const { sender, receiver, text } = data;
-  //console.log(data);
+  console.log("eijsijae");
+  console.log(data, "jsafasjfdo");
   const receiverData = await db("socketids").where({ name: receiver });
   const seen_by = [sender];
   if (users[receiverData[0].id]) {

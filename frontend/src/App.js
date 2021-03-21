@@ -4,18 +4,21 @@ import { useState, useEffect } from "react";
 import ChatDir from "./Pages/ChatDir.pages";
 import Signup from "./Components/SignUp.component";
 import Login from "./Components/Login.component";
+import GroupSetting from "./Pages/GroupSetting.pages";
 
 function App() {
   const [user, setUser] = useState({});
   const history = useHistory();
   useEffect(() => {
     console.log(history);
-    if (
-      !user.username &&
-      history.location.pathname !== "/login" &&
-      history.location.pathname !== "/signup"
-    ) {
-      history.push("/signup");
+    if (user) {
+      if (
+        !user.username &&
+        history.location.pathname !== "/login" &&
+        history.location.pathname !== "/signup"
+      ) {
+        history.push("/signup");
+      }
     }
   });
   useEffect(() => {
@@ -28,11 +31,12 @@ function App() {
         <Route path="/signup" render={() => <Signup setUser={setUser} />} />
         <Route path="/login" render={() => <Login setUser={setUser} />} />
         <Route
-          path="/:type/@:groupid"
-          render={() => <Chat user={user.username} />}
+          path="/:groupid/edit"
+          render={() => <GroupSetting user={user.username} />}
         />
+        <Route path="/:type/:id" render={() => <Chat user={user.username} />} />
         <Route
-          path="/:type/@:friend"
+          path="/:type/@:id"
           render={() => <Chat user={user.username} />}
         />
       </Switch>
