@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import io from "socket.io-client";
 import { uid } from "uid";
+import { NavBarPrimary } from "../Components/Styles";
 let socket;
 const ChatDir = ({ user }) => {
   const [groupName, setGroupName] = useState("");
@@ -127,14 +128,56 @@ const ChatDir = ({ user }) => {
   };
   return (
     <div className="">
-      <button
-        onClick={() => {
-          setDeleteChat(!deleteChat);
-          setSelectedChats([]);
-        }}
-      >
-        {!deleteChat ? "delete Chat" : "cancel"}
-      </button>
+      <NavBarPrimary>
+        <div className="nav-items__right">
+          {isCreate ? <button onClick={createGroup}>Submit</button> : null}
+          {deleteChat ? (
+            <button onClick={onDeleteMessage}>Delete</button>
+          ) : null}
+        </div>
+        <div className="nav-items__left">
+          <button onClick={() => setIsCreate(!isCreate)}>
+            {!isCreate ? (
+              <svg
+                version="1.1"
+                id="Capa_1"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlnsXlink="http://www.w3.org/1999/xlink"
+                x="0px"
+                y="0px"
+                width="30px"
+                height="30px"
+                viewBox="0 0 612 612"
+                style={{ enableBackground: "new 0 0 612 612" }}
+                xmlSpace="preserve"
+              >
+                <g>
+                  <g id="group-add">
+                    <path
+                      d="M204,267.75h-76.5v-76.5h-51v76.5H0v51h76.5v76.5h51v-76.5H204V267.75z M459,293.25c43.35,0,76.5-33.15,76.5-76.5
+			s-33.15-76.5-76.5-76.5c-7.65,0-15.3,2.55-22.95,2.55c15.3,22.95,22.95,45.9,22.95,73.95s-7.65,51-22.95,73.95
+			C443.7,290.7,451.35,293.25,459,293.25z M331.5,293.25c43.35,0,76.5-33.15,76.5-76.5s-33.15-76.5-76.5-76.5
+			c-43.35,0-76.5,33.15-76.5,76.5S288.15,293.25,331.5,293.25z M499.8,349.35c20.4,17.851,35.7,43.351,35.7,71.4v51H612v-51
+			C612,382.5,550.8,357,499.8,349.35z M331.5,344.25c-51,0-153,25.5-153,76.5v51h306v-51C484.5,369.75,382.5,344.25,331.5,344.25z"
+                    />
+                  </g>
+                </g>
+              </svg>
+            ) : (
+              "Cancel"
+            )}
+          </button>
+          <button
+            onClick={() => {
+              setDeleteChat(!deleteChat);
+              setSelectedChats([]);
+            }}
+          >
+            {!deleteChat ? "delete Chat" : "cancel"}
+          </button>
+        </div>
+      </NavBarPrimary>
+
       <div className="private_chat">
         <input
           type="text"
@@ -189,8 +232,7 @@ const ChatDir = ({ user }) => {
           );
         })}
       </ul>
-      <button onClick={() => setIsCreate(true)}>Create Group</button>
-      {deleteChat ? <button onClick={onDeleteMessage}>Delete</button> : null}
+
       {isCreate ? (
         <div className="">
           <input
@@ -227,7 +269,6 @@ const ChatDir = ({ user }) => {
                   </label>
                 ))
             : null}
-          <button onClick={createGroup}>Submit</button>
         </div>
       ) : null}
     </div>

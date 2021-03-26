@@ -32,7 +32,8 @@ db.schema.hasTable("all_users").then(function (exists) {
     });
   }
 });
-
+const g = ["jhsjha", "uisdhfuiah", "fsjdja"];
+console.log(db("private_messages").whereIn("chatid", g).toQuery());
 // all group routes
 app.use("/group", groupRoute(db));
 // all delete routes
